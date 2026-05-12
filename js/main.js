@@ -619,6 +619,26 @@ function applyLivePrices(liveMap) {
     }
     card.classList.add('has-live-price');
   });
+
+  // Update ticker strip prices dynamically
+  document.querySelectorAll('.ticker-item').forEach(item => {
+    const symEl = item.querySelector('.t-sym');
+    if (!symEl) return;
+    const sym = symEl.textContent.trim();
+    const live = liveMap[sym];
+    if (!live || typeof live.price !== 'number') return;
+    
+    const priceEl = item.querySelector('.t-px');
+    const changeEl = item.querySelector('.t-chg');
+    if (priceEl) priceEl.textContent = '$' + live.price.toFixed(2);
+    if (changeEl) {
+      const pct = typeof live.changePct === 'number' ? live.changePct : 0;
+      const up = pct >= 0;
+      changeEl.textContent = (up ? '+' : '') + pct.toFixed(2) + '%';
+      changeEl.className = 't-chg ' + (up ? 'up' : 'down');
+    }
+  });
+
   setLiveStatus(true);
 }
 

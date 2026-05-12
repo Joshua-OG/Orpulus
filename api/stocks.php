@@ -43,7 +43,7 @@ function fetchYahooQuotes(array $symbols): array {
 
     $symbolStr = rawurlencode(implode(',', $symbols));
     $fields    = 'regularMarketPrice,regularMarketChangePercent,fiftyTwoWeekChangePercent,regularMarketVolume,regularMarketTime,shortName,longName';
-    $url       = "https://query1.finance.yahoo.com/v7/finance/quote?symbols={$symbolStr}&fields={$fields}";
+    $url       = "https://query1.finance.yahoo.com/v7/finance/quote?symbols={$symbolStr}&fields={$fields}&corsDomain=finance.yahoo.com";
     $ctx = stream_context_create(['http' => [
         'method'  => 'GET',
         'header'  => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\nAccept: application/json\r\n",
