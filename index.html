@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Orpulus — Revolutionizing manufacturing and supply chain management through innovative technology and data insights. Coming Soon."/>
+  <meta name="theme-color" content="#07090F"/>
+  <title>Orpulus — Coming Soon</title>
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+</head>
+<body>
+
+<!-- Loading bar -->
+<div class="load-bar" id="loadBar"></div>
+
+<!-- ════ NAVIGATION ════════════════════════════════ -->
+<nav class="nav" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="#" data-tab="home" class="nav-logo" aria-label="Orpulus — go to home" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+    <svg width="32" height="32" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="100" cy="100" r="94" stroke="#E2E8F0" stroke-width="9" fill="none"/>
+      <rect x="115" y="6" width="14" height="188" fill="#07090F"/>
+      <line x1="122" y1="6" x2="122" y2="194" stroke="#E2E8F0" stroke-width="1.2"/>
+      <line x1="122" y1="20"  x2="135" y2="20"  stroke="#E2E8F0" stroke-width="1.2"/>
+      <line x1="122" y1="30"  x2="130" y2="30"  stroke="#E2E8F0" stroke-width="0.9"/>
+      <line x1="122" y1="40"  x2="135" y2="40"  stroke="#E2E8F0" stroke-width="1.2"/>
+      <line x1="122" y1="50"  x2="130" y2="50"  stroke="#E2E8F0" stroke-width="0.9"/>
+      <line x1="122" y1="60"  x2="135" y2="60"  stroke="#E2E8F0" stroke-width="1.2"/>
+      <line x1="122" y1="70"  x2="130" y2="70"  stroke="#E2E8F0" stroke-width="0.9"/>
+      <line x1="122" y1="80"  x2="135" y2="80"  stroke="#E2E8F0" stroke-width="1.2"/>
+      <line x1="122" y1="90"  x2="130" y2="90"  stroke="#E2E8F0" stroke-width="0.9"/>
+      <line x1="122" y1="100" x2="138" y2="100" stroke="#E2E8F0" stroke-width="1.4"/>
+      <line x1="122" y1="110" x2="130" y2="110" stroke="#E2E8F0" stroke-width="0.9"/>
+      <line x1="122" y1="120" x2="135" y2="120" stroke="#E2E8F0" stroke-width="1.2"/>
+      <line x1="122" y1="130" x2="130" y2="130" stroke="#E2E8F0" stroke-width="0.9"/>
+      <line x1="122" y1="140" x2="135" y2="140" stroke="#E2E8F0" stroke-width="1.2"/>
+      <line x1="122" y1="150" x2="130" y2="150" stroke="#E2E8F0" stroke-width="0.9"/>
+      <line x1="122" y1="160" x2="135" y2="160" stroke="#E2E8F0" stroke-width="1.2"/>
+      <line x1="122" y1="170" x2="130" y2="170" stroke="#E2E8F0" stroke-width="0.9"/>
+      <line x1="122" y1="180" x2="135" y2="180" stroke="#E2E8F0" stroke-width="1.2"/>
+    </svg>
+    <span style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:1.1rem;font-weight:600;letter-spacing:0.04em;color:#E2E8F0">Orpulus</span>
+  </a>
+
+  <ul class="nav-tabs" role="tablist">
+    <li role="none"><button role="tab" data-tab="home"     class="active" aria-selected="true">Home</button></li>
+    <li role="none"><button role="tab" data-tab="story"    aria-selected="false">Our Story</button></li>
+    <li role="none"><button role="tab" data-tab="values"   aria-selected="false">Values</button></li>
+    <li role="none"><button role="tab" data-tab="software" aria-selected="false">Software</button></li>
+    <li role="none"><button role="tab" data-tab="markets"  aria-selected="false">Markets</button></li>
+  </ul>
+
+  <div class="nav-cta">
+    <button class="btn-primary" onclick="showTab('home');setTimeout(()=>document.getElementById('hero-name').focus(),200)">
+      Get Notified
+    </button>
+  </div>
+
+  <button class="ham" id="ham" aria-label="Open navigation menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<nav class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
+  <button data-tab="home"     class="active">Home</button>
+  <button data-tab="story">Our Story</button>
+  <button data-tab="values">Values</button>
+  <button data-tab="software">Software</button>
+  <button data-tab="markets">Markets</button>
+</nav>
+
+
+<!-- ════════════════════════════════════════════════
+     TAB: HOME
+════════════════════════════════════════════════ -->
+<div class="tab-page active" id="tab-home" role="tabpanel" aria-label="Home">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg hero-bg-animated" style="background:linear-gradient(135deg,#07090F,#0D1322,#111827,#0A0D16,#0D1322,#07090F)"></div>
+    <div class="hero-img"></div>
+    <div class="hero-blobs" aria-hidden="true">
+      <div class="blob blob-1 blob-animate-1"></div>
+      <div class="blob blob-2 blob-animate-2"></div>
+      <div class="blob blob-3 blob-animate-3"></div>
+    </div>
+
+    <!-- Decorative image strip -->
+    <div aria-hidden="true" style="position:absolute;top:0;right:0;width:36%;height:100%;z-index:2;overflow:hidden;border-radius:0 0 0 80px;opacity:0.10;">
+      <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=70"
+           alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;filter:grayscale(0.4) brightness(0.6)"/>
+    </div>
+
+    <div class="container" style="position:relative;z-index:3">
+      <div class="hero-inner">
+        <div class="hero-badge anim-hero-badge">
+          <span class="badge-dot" style="position:relative"></span>
+          Something Extraordinary Is Coming
+        </div>
+
+        <h1 class="hero-title anim-hero-title">
+          COMING<br/><span class="accent">SOON</span>
+        </h1>
+        <p class="hero-eyeline anim-hero-eye">Orpulus &nbsp;·&nbsp; Est. 2026</p>
+
+        <p class="hero-sub anim-hero-sub">
+          We are building the future of manufacturing and supply chain management —
+          where technology meets purpose and innovation drives sustainable impact
+          for businesses and communities alike.
+        </p>
+
+        <!-- Countdown -->
+        <div class="countdown anim-hero-count" id="countdown" aria-label="Countdown to launch">
+          <div class="cd-item">
+            <div class="cd-box"><span class="cd-num" id="cd-d">091</span></div>
+            <span class="cd-label">Days</span>
+          </div>
+          <span class="cd-sep" aria-hidden="true">:</span>
+          <div class="cd-item">
+            <div class="cd-box"><span class="cd-num" id="cd-h">00</span></div>
+            <span class="cd-label">Hours</span>
+          </div>
+          <span class="cd-sep" aria-hidden="true">:</span>
+          <div class="cd-item">
+            <div class="cd-box"><span class="cd-num" id="cd-m">00</span></div>
+            <span class="cd-label">Minutes</span>
+          </div>
+          <span class="cd-sep" aria-hidden="true">:</span>
+          <div class="cd-item">
+            <div class="cd-box"><span class="cd-num" id="cd-s">00</span></div>
+            <span class="cd-label">Seconds</span>
+          </div>
+        </div>
+
+        <!-- Notify form -->
+        <div class="hero-form-wrap anim-hero-form">
+          <form class="hero-form notify-form-js" id="heroForm" novalidate>
+            <label for="hero-name" class="sr-only">Your name</label>
+            <input type="text"  id="hero-name"  name="name"  placeholder="Your full name"      autocomplete="name"  required/>
+            <label for="hero-email" class="sr-only">Email address</label>
+            <input type="email" id="hero-email" name="email" placeholder="Your email address"  autocomplete="email" required/>
+            <button type="submit" class="btn-primary btn-bounce" data-label="Notify Me" style="grid-column:1/-1">
+              Notify Me When We Launch
+            </button>
+          </form>
+          <p class="hero-note anim-hero-note">No spam — be the first to know.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Markets CTA -->
+  <section class="section-pad" style="background:var(--bg-base);padding-top:48px;padding-bottom:0">
+    <div class="container">
+      <div class="home-markets-cta reveal">
+        <div class="hmc-icon" aria-hidden="true">
+          <svg width="36" height="36" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="94" stroke="currentColor" stroke-width="9" fill="none"/>
+            <rect x="115" y="6" width="14" height="188" fill="transparent"/>
+            <line x1="122" y1="6" x2="122" y2="194" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="122" y1="50" x2="138" y2="50" stroke="currentColor" stroke-width="1.2"/>
+            <line x1="122" y1="100" x2="142" y2="100" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="122" y1="150" x2="138" y2="150" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <div class="hmc-body">
+          <p class="hmc-eyebrow mono-tag">While You Wait</p>
+          <h3 class="hmc-title">AI Market Intelligence — Live Now</h3>
+          <p class="hmc-desc">Our AI scans 105 stocks daily across Growth, Value, Analyst Consensus, Momentum, and Risk. It surfaces today's top picks, scores your existing holdings, and watches the IPO pipeline — tailored to your risk profile.</p>
+        </div>
+        <button class="btn-primary hmc-btn" onclick="showTab('markets')">Explore Markets →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Orpulus -->
+  <section class="why-strip">
+    <div class="container">
+      <p class="section-label reveal" style="justify-content:center;margin-bottom:40px">Why Orpulus</p>
+      <div class="why-grid stagger-children">
+        <div class="why-card reveal">
+          <div class="why-icon-wrap icon-clay"><span>🔗</span></div>
+          <h3>End-to-End Visibility</h3>
+          <p>Real-time intelligence across every node of your supply chain — from raw materials to final delivery — so nothing falls through the cracks.</p>
+        </div>
+        <div class="why-card reveal d1">
+          <div class="why-icon-wrap icon-rose"><span>📊</span></div>
+          <h3>Data-Driven Decisions</h3>
+          <p>Turn operational data into actionable insights with AI-powered analytics built specifically for manufacturing and logistics environments.</p>
+        </div>
+        <div class="why-card reveal d2">
+          <div class="why-icon-wrap icon-sage"><span>🌿</span></div>
+          <h3>Sustainable by Design</h3>
+          <p>Every solution we build embeds sustainability metrics — helping you meet ESG goals while driving efficiency and growth simultaneously.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Industries -->
+  <section class="industries-section">
+    <div class="container">
+      <p class="section-label reveal">Industries We Serve</p>
+      <h2 class="section-title reveal">Built for Complex Operations</h2>
+      <div class="ind-grid stagger-children">
+        <div class="ind-chip reveal"><span class="ind-ico">🏭</span> Manufacturing</div>
+        <div class="ind-chip reveal"><span class="ind-ico">🚢</span> Logistics &amp; Freight</div>
+        <div class="ind-chip reveal"><span class="ind-ico">🏗️</span> Industrial Operations</div>
+        <div class="ind-chip reveal"><span class="ind-ico">🛒</span> Retail Supply Chains</div>
+        <div class="ind-chip reveal"><span class="ind-ico">💊</span> Pharmaceuticals</div>
+        <div class="ind-chip reveal"><span class="ind-ico">🌾</span> Agri-Business</div>
+        <div class="ind-chip reveal"><span class="ind-ico">⚡</span> Energy &amp; Utilities</div>
+        <div class="ind-chip reveal"><span class="ind-ico">🖥️</span> Technology Hardware</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="logo-area">
+          <svg width="28" height="28" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="opacity:0.55"><circle cx="100" cy="100" r="94" stroke="#E2E8F0" stroke-width="9" fill="none"/><rect x="115" y="6" width="14" height="188" fill="rgba(7,9,15,0.01)"/><line x1="122" y1="6" x2="122" y2="194" stroke="#E2E8F0" stroke-width="1.2"/><line x1="122" y1="50" x2="136" y2="50" stroke="#E2E8F0" stroke-width="1.0"/><line x1="122" y1="100" x2="140" y2="100" stroke="#E2E8F0" stroke-width="1.4"/><line x1="122" y1="150" x2="136" y2="150" stroke="#E2E8F0" stroke-width="1.0"/></svg><span style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:1.1rem;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.55)">Orpulus</span></div><p>Revolutionizing manufacturing and supply chain management through innovative technology and a commitment to a sustainable future.</p></div><div class="footer-col"><h4>Navigate</h4><ul><li><a href="#" onclick="showTab('home');return false">Home</a></li><li><a href="#" onclick="showTab('values');return false">Values</a></li><li><a href="#" onclick="showTab('software');return false">Software</a></li><li><a href="#" onclick="showTab('markets');return false">Markets</a></li></ul></div><div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="mailto:hello@orpulus.com">Contact</a></li></ul></div><div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms</a></li></ul></div></div><div class="footer-bottom"><p class="footer-copy">&copy; <span class="yr"></span> Orpulus. All rights reserved.</p><p class="footer-copy">hello@orpulus.com</p></div></footer>
+</div><!-- /tab-story -->
+
+
+<!-- ════════════════════════════════════════════════
+     TAB: VALUES
+════════════════════════════════════════════════ -->
+<div class="tab-page" id="tab-values" role="tabpanel" aria-label="Values">
+
+  <div class="page-hero" style="--hero-img:url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=60')">
+    <div class="page-hero-bg-img"></div>
+    <div class="container">
+      <p class="section-label">What Drives Us</p>
+      <h1 class="section-title" style="max-width:520px">Our Core Values</h1>
+      <div class="divider"></div>
+      <p class="section-desc">
+        Our values aren't words on a wall — they are the behavioral commitments that guide
+        every decision, every interaction, and every line of code we write.
+      </p>
+    </div>
+  </div>
+
+  <section class="section-pad" style="background:var(--bg-surface)">
+    <div class="container">
+      <div class="values-grid stagger-children">
+        <div class="value-card reveal">
+          <div class="value-card-color vc-clay"></div>
+          <div class="value-emoji-wrap">🤝</div>
+          <div class="value-name">Respect</div>
+          <p class="value-desc">We embrace diversity and foster an inclusive environment where everyone feels valued, respected, and empowered to bring their authentic selves.</p>
+        </div>
+        <div class="value-card reveal d1">
+          <div class="value-card-color vc-rose"></div>
+          <div class="value-emoji-wrap">💡</div>
+          <div class="value-name">Collaboration</div>
+          <p class="value-desc">We work together as a team, leveraging our diverse perspectives and experiences to drive innovation and excellence in everything we do.</p>
+        </div>
+        <div class="value-card reveal d2">
+          <div class="value-card-color vc-sage"></div>
+          <div class="value-emoji-wrap">⚖️</div>
+          <div class="value-name">Equity</div>
+          <p class="value-desc">We promote fairness and equal opportunities for all, actively addressing barriers and biases to create a level playing field.</p>
+        </div>
+        <div class="value-card reveal d3">
+          <div class="value-card-color vc-amber"></div>
+          <div class="value-emoji-wrap">❤️</div>
+          <div class="value-name">Empathy</div>
+          <p class="value-desc">We strive to understand and appreciate the unique experiences and backgrounds of our colleagues, clients, and communities.</p>
+        </div>
+        <div class="value-card reveal">
+          <div class="value-card-color vc-nude"></div>
+          <div class="value-emoji-wrap">🌱</div>
+          <div class="value-name">Growth</div>
+          <p class="value-desc">We embrace learning and development, encouraging individuals to grow and thrive in both their careers and personal lives.</p>
+        </div>
+        <div class="value-card reveal d1">
+          <div class="value-card-color vc-warm"></div>
+          <div class="value-emoji-wrap">🔒</div>
+          <div class="value-name">Integrity</div>
+          <p class="value-desc">We act with honesty, transparency, and ethical behavior in all our interactions, building lasting trust and credibility.</p>
+        </div>
+        <div class="value-card reveal d2">
+          <div class="value-card-color vc-earth"></div>
+          <div class="value-emoji-wrap">🔄</div>
+          <div class="value-name">Adaptability</div>
+          <p class="value-desc">We embrace change and adapt to evolving needs, staying agile and innovative in a rapidly changing world.</p>
+        </div>
+        <div class="value-card reveal d3">
+          <div class="value-card-color vc-gold"></div>
+          <div class="value-emoji-wrap">⭐</div>
+          <div class="value-name">Excellence</div>
+          <p class="value-desc">We strive for exceptional performance, continuous improvement, and outstanding results that make a measurable, positive impact.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--bg-base);padding:80px 0">
+    <div class="container">
+      <div class="culture-banner reveal">
+        <p>"By living these values, we create a culture where everyone feels valued, included, and empowered to thrive."</p>
+        <cite>— The Orpulus Culture Commitment</cite>
+      </div>
+    </div>
+  </section>
+
+  <div style="height:280px;overflow:hidden;position:relative">
+    <img src="https://images.unsplash.com/photo-1531844251246-bf8a6ec03b0f?auto=format&fit=crop&w=1600&q=70"
+         alt="Diverse team working together" loading="lazy"
+         style="width:100%;height:100%;object-fit:cover;filter:saturate(0.5) brightness(0.35)"/>
+    <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,9,15,0.92) 0%,transparent 50%,rgba(7,9,15,0.92) 100%)"></div>
+  </div>
+
+  <section class="section-pad" style="background:var(--bg-surface)">
+    <div class="container">
+      <p class="section-label reveal">In Practice</p>
+      <h2 class="section-title reveal">How We Live Our Values</h2>
+      <div class="divider reveal"></div>
+      <div class="commitments-grid stagger-children">
+        <div class="commit-card reveal">
+          <div class="commit-ico">🏢</div>
+          <h4>Inclusive Hiring</h4>
+          <p>We actively remove bias from our recruitment process and build teams that reflect the diversity of the communities we serve.</p>
+        </div>
+        <div class="commit-card reveal d1">
+          <div class="commit-ico">🌍</div>
+          <h4>Environmental Accountability</h4>
+          <p>We measure and reduce our own operational footprint while building tools that help our clients do the same.</p>
+        </div>
+        <div class="commit-card reveal d2">
+          <div class="commit-ico">📚</div>
+          <h4>Continuous Learning</h4>
+          <p>Every team member has dedicated time and budget for professional development — because growth is core to who we are.</p>
+        </div>
+        <div class="commit-card reveal">
+          <div class="commit-ico">🤲</div>
+          <h4>Community Investment</h4>
+          <p>We allocate a portion of revenue to community programs and social initiatives aligned with our mission of positive societal impact.</p>
+        </div>
+        <div class="commit-card reveal d1">
+          <div class="commit-ico">🔍</div>
+          <h4>Radical Transparency</h4>
+          <p>We share our progress, setbacks, and decisions openly — with our team, partners, and clients. Trust is built through honesty.</p>
+        </div>
+        <div class="commit-card reveal d2">
+          <div class="commit-ico">🚀</div>
+          <h4>Bold Innovation</h4>
+          <p>We encourage our people to challenge assumptions, experiment, and take smart risks — because that's where meaningful breakthroughs are found.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="footer-inner"><div class="footer-brand"><div class="logo-area"><svg width="28" height="28" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="opacity:0.55"><circle cx="100" cy="100" r="94" stroke="#E2E8F0" stroke-width="9" fill="none"/><rect x="115" y="6" width="14" height="188" fill="rgba(7,9,15,0.01)"/><line x1="122" y1="6" x2="122" y2="194" stroke="#E2E8F0" stroke-width="1.2"/><line x1="122" y1="50" x2="136" y2="50" stroke="#E2E8F0" stroke-width="1.0"/><line x1="122" y1="100" x2="140" y2="100" stroke="#E2E8F0" stroke-width="1.4"/><line x1="122" y1="150" x2="136" y2="150" stroke="#E2E8F0" stroke-width="1.0"/></svg><span style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:1.1rem;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.55)">Orpulus</span></div><p>Revolutionizing manufacturing and supply chain management through innovative technology and a commitment to a sustainable future.</p></div><div class="footer-col"><h4>Navigate</h4><ul><li><a href="#" onclick="showTab('home');return false">Home</a></li><li><a href="#" onclick="showTab('story');return false">Our Story</a></li><li><a href="#" onclick="showTab('software');return false">Software</a></li><li><a href="#" onclick="showTab('markets');return false">Markets</a></li></ul></div><div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="mailto:hello@orpulus.com">Contact</a></li></ul></div><div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms</a></li></ul></div></div><div class="footer-bottom"><p class="footer-copy">&copy; <span class="yr"></span> Orpulus. All rights reserved.</p><p class="footer-copy">hello@orpulus.com</p></div></footer>
+</div><!-- /tab-values -->
+
+
+<!-- ════════════════════════════════════════════════
+     TAB: SOFTWARE
+════════════════════════════════════════════════ -->
+<div class="tab-page" id="tab-software" role="tabpanel" aria-label="Software">
+
+  <div class="software-hero-section">
+    <div class="container">
+      <p class="section-label">In Development</p>
+      <h1 class="section-title">Software Applications</h1>
+      <div class="divider"></div>
+      <p class="section-desc">
+        A purpose-built suite of intelligent tools designed to transform how manufacturers
+        and supply chain operators work — smarter, leaner, and more sustainably.
+      </p>
+      <div class="stats-row">
+        <div class="stat-chip">
+          <span class="stat-num" data-target="4">4</span>
+          <span class="stat-label">Applications<br/>in Pipeline</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-num" data-target="2">2</span>
+          <span class="stat-label">Actively in<br/>Development</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-num">2026</span>
+          <span class="stat-label">Projected<br/>First Launch</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="section-pad" style="background:var(--bg-base)">
+    <div class="container">
+
+      <div class="filter-row" role="group" aria-label="Filter applications by status">
+        <button class="filter-btn active" data-filter="all">All Apps</button>
+        <button class="filter-btn" data-filter="dev">In Development</button>
+        <button class="filter-btn" data-filter="soon">Coming Soon</button>
+        <button class="filter-btn" data-filter="planning">Planning</button>
+      </div>
+
+      <div class="apps-grid">
+
+        <div class="app-card reveal" data-category="dev">
+          <div class="app-card-accent pf-clay"></div>
+          <div class="app-card-top">
+            <div class="app-icon">🔗</div>
+            <span class="app-status status-dev"><span class="s-dot"></span>In Development</span>
+          </div>
+          <div>
+            <div class="app-name">SupplyIQ</div>
+            <div class="app-tagline">Intelligent Supply Chain Visibility</div>
+          </div>
+          <p class="app-desc">An AI-powered platform providing end-to-end supply chain visibility, predictive disruption alerts, and optimization recommendations — reduce costs, minimize delays, and improve on-time delivery performance across your entire network.</p>
+          <div class="app-tags">
+            <span class="app-tag">AI Forecasting</span>
+            <span class="app-tag">Real-time Tracking</span>
+            <span class="app-tag">Risk Alerts</span>
+            <span class="app-tag">Supplier Analytics</span>
+            <span class="app-tag">Route Optimization</span>
+          </div>
+          <div class="app-progress">
+            <div class="prog-meta"><span>Development Progress</span><span>65%</span></div>
+            <div class="prog-bar"><div class="prog-fill pf-clay" data-w="65%"></div></div>
+          </div>
+        </div>
+
+        <div class="app-card reveal d1" data-category="dev">
+          <div class="app-card-accent pf-amber"></div>
+          <div class="app-card-top">
+            <div class="app-icon">⚙️</div>
+            <span class="app-status status-dev"><span class="s-dot"></span>In Development</span>
+          </div>
+          <div>
+            <div class="app-name">ManufactIQ</div>
+            <div class="app-tagline">Manufacturing Process Intelligence</div>
+          </div>
+          <p class="app-desc">A real-time manufacturing analytics platform that monitors production lines, identifies process bottlenecks, and surfaces quality-improvement opportunities — connecting your shop floor to actionable intelligence.</p>
+          <div class="app-tags">
+            <span class="app-tag">OEE Tracking</span>
+            <span class="app-tag">Predictive Maintenance</span>
+            <span class="app-tag">Quality Control</span>
+            <span class="app-tag">Downtime Analysis</span>
+            <span class="app-tag">IoT Integration</span>
+          </div>
+          <div class="app-progress">
+            <div class="prog-meta"><span>Development Progress</span><span>48%</span></div>
+            <div class="prog-bar"><div class="prog-fill pf-amber" data-w="48%"></div></div>
+          </div>
+        </div>
+
+        <div class="app-card reveal d2" data-category="soon">
+          <div class="app-card-accent pf-sage"></div>
+          <div class="app-card-top">
+            <div class="app-icon">🌿</div>
+            <span class="app-status status-soon"><span class="s-dot"></span>Coming Soon</span>
+          </div>
+          <div>
+            <div class="app-name">EcoMetrics</div>
+            <div class="app-tagline">Sustainability &amp; ESG Reporting</div>
+          </div>
+          <p class="app-desc">A comprehensive environmental impact monitoring and ESG reporting platform — track, measure, and reduce your carbon footprint while ensuring regulatory compliance and building stakeholder confidence in your sustainability commitments.</p>
+          <div class="app-tags">
+            <span class="app-tag">Carbon Tracking</span>
+            <span class="app-tag">ESG Dashboards</span>
+            <span class="app-tag">Compliance Tools</span>
+            <span class="app-tag">Scope 1, 2 &amp; 3</span>
+            <span class="app-tag">Audit-Ready Reports</span>
+          </div>
+          <div class="app-progress">
+            <div class="prog-meta"><span>Development Progress</span><span>30%</span></div>
+            <div class="prog-bar"><div class="prog-fill pf-sage" data-w="30%"></div></div>
+          </div>
+        </div>
+
+        <div class="app-card reveal d3" data-category="planning">
+          <div class="app-card-accent pf-rose"></div>
+          <div class="app-card-top">
+            <div class="app-icon">📊</div>
+            <span class="app-status status-planning"><span class="s-dot"></span>Planning</span>
+          </div>
+          <div>
+            <div class="app-name">ProcessForge</div>
+            <div class="app-tagline">Business Process Automation</div>
+          </div>
+          <p class="app-desc">An intelligent workflow automation platform that maps, analyzes, and optimizes business processes enterprise-wide — eliminating bottlenecks, reducing manual work, and driving measurable efficiency gains from day one.</p>
+          <div class="app-tags">
+            <span class="app-tag">Workflow Automation</span>
+            <span class="app-tag">Process Mining</span>
+            <span class="app-tag">KPI Dashboards</span>
+            <span class="app-tag">No-Code Builder</span>
+            <span class="app-tag">ERP Integration</span>
+          </div>
+          <div class="app-progress">
+            <div class="prog-meta"><span>Development Progress</span><span>15%</span></div>
+            <div class="prog-bar"><div class="prog-fill pf-rose" data-w="15%"></div></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="notify-strip reveal">
+        <div class="notify-text">
+          <h3>Get Early Access</h3>
+          <p>Be first in line when our applications launch — sign up for early access below.</p>
+        </div>
+        <form class="notify-form notify-form-js" id="softwareForm" novalidate>
+          <label for="sw-name" class="sr-only">Your name</label>
+          <input type="text"  id="sw-name"  name="name"  class="form-input" placeholder="Your name"  required/>
+          <label for="sw-email" class="sr-only">Your email</label>
+          <input type="email" id="sw-email" name="email" class="form-input" placeholder="Your email" required/>
+          <button type="submit" class="btn-primary" data-label="Request Early Access">Request Early Access</button>
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+  <footer><div class="footer-inner"><div class="footer-brand"><div class="logo-area"><svg width="28" height="28" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="opacity:0.55"><circle cx="100" cy="100" r="94" stroke="#E2E8F0" stroke-width="9" fill="none"/><rect x="115" y="6" width="14" height="188" fill="rgba(7,9,15,0.01)"/><line x1="122" y1="6" x2="122" y2="194" stroke="#E2E8F0" stroke-width="1.2"/><line x1="122" y1="50" x2="136" y2="50" stroke="#E2E8F0" stroke-width="1.0"/><line x1="122" y1="100" x2="140" y2="100" stroke="#E2E8F0" stroke-width="1.4"/><line x1="122" y1="150" x2="136" y2="150" stroke="#E2E8F0" stroke-width="1.0"/></svg><span style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:1.1rem;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.55)">Orpulus</span></div><p>Revolutionizing manufacturing and supply chain management through innovative technology and a commitment to a sustainable future.</p></div><div class="footer-col"><h4>Navigate</h4><ul><li><a href="#" onclick="showTab('home');return false">Home</a></li><li><a href="#" onclick="showTab('story');return false">Our Story</a></li><li><a href="#" onclick="showTab('values');return false">Values</a></li><li><a href="#" onclick="showTab('markets');return false">Markets</a></li></ul></div><div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="mailto:hello@orpulus.com">Contact</a></li></ul></div><div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms</a></li></ul></div></div><div class="footer-bottom"><p class="footer-copy">&copy; <span class="yr"></span> Orpulus. All rights reserved.</p><p class="footer-copy">hello@orpulus.com</p></div></footer>
+</div><!-- /tab-software -->
+
+
+<!-- ════════════════════════════════════════════════
+     TAB: MARKETS — AI STOCK INTELLIGENCE
+════════════════════════════════════════════════ -->
+<div class="tab-page" id="tab-markets" role="tabpanel" aria-label="Markets">
+
+  <!-- Hero -->
+  <div class="markets-hero">
+    <div class="markets-hero-grid" aria-hidden="true"></div>
+    <div class="markets-hero-glow" aria-hidden="true"></div>
+    <div class="container">
+      <div class="markets-hero-inner">
+        <div class="markets-badge">
+          <span class="badge-dot" style="position:relative;background:var(--green)"></span>
+          Live Market Analysis
+        </div>
+        <h1 class="markets-title">AI Market<br/><span class="accent">Intelligence</span></h1>
+        <p class="markets-sub">
+          Multi-factor AI analysis scanning 105 stocks daily across Growth, Value, Analyst Consensus,
+          Momentum, and Risk — surfacing the top 10 picks for your risk profile, refreshed every 6 hours.
+        </p>
+        <div class="markets-meta">
+          <span class="refresh-dot"></span>
+          <span id="markets-updated">Loading…</span>
+          <span class="markets-dot">·</span>
+          <span id="markets-scanned">32 stocks scanned</span>
+          <span class="markets-dot">·</span>
+          <span id="markets-data-source">Connecting…</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live ticker strip -->
+  <div class="ticker-strip" aria-hidden="true">
+    <div class="ticker-track" id="ticker-track">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- Score factor legend -->
+  <div class="score-legend-bar">
+    <div class="container">
+      <div class="score-legend">
+        <span class="legend-label">AI Score Factors</span>
+        <span class="legend-item"><span class="li-dot" style="background:#6366F1"></span>Growth 25%</span>
+        <span class="legend-item"><span class="li-dot" style="background:#22D3EE"></span>Value 20%</span>
+        <span class="legend-item"><span class="li-dot" style="background:#F59E0B"></span>Analysts 20%</span>
+        <span class="legend-item"><span class="li-dot" style="background:#10B981"></span>Momentum 20%</span>
+        <span class="legend-item"><span class="li-dot" style="background:#A855F7"></span>Risk 15%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock cards -->
+  <section class="section-pad" style="background:var(--bg-base)">
+    <div class="container">
+
+      <!-- Risk profile selector -->
+      <div class="risk-profile-bar">
+        <span class="mono-tag" style="color:var(--text-secondary);margin-right:8px">Risk Profile</span>
+        <button class="risk-tab conservative" data-profile="conservative">Conservative</button>
+        <button class="risk-tab balanced active" data-profile="balanced">Balanced</button>
+        <button class="risk-tab aggressive" data-profile="aggressive">Aggressive</button>
+        <span class="live-badge" id="live-badge" style="margin-left:auto">
+          <span class="live-dot-sm"></span>Live
+        </span>
+      </div>
+
+      <div class="stocks-refresh-bar">
+        <h2>Today's Top 10 Picks</h2>
+        <div class="refresh-info">
+          <span class="refresh-dot"></span>
+          <span>Updates every 6 hours · Scores recalculated daily</span>
+          <button class="btn-secondary" style="padding:7px 16px;font-size:0.78rem" onclick="loadStocks(true)">↺ Refresh</button>
+        </div>
+      </div>
+
+      <div id="stocks-grid" class="stocks-grid">
+        <div class="stocks-loading" id="stocks-loading">
+          <div class="loading-spinner"></div>
+          <p>AI is scanning the market…</p>
+        </div>
+      </div>
+
+      <div class="stocks-disclaimer">
+        <p>⚠ <strong>Disclaimer:</strong> This tool is for informational and educational purposes only and does not constitute financial advice. AI-generated scores and recommendations are based on quantitative models and historical data. Always conduct your own due diligence and consult a licensed financial advisor before making any investment decisions. Past performance does not guarantee future results. Orpulus is not responsible for any trading decisions made based on this information.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- IPO Watchlist -->
+  <section class="section-pad ipo-section" style="background:var(--bg-surface)">
+    <div class="container">
+      <p class="section-eyebrow mono-tag">IPO Pipeline</p>
+      <h2 class="section-h2">IPO Watchlist</h2>
+      <p class="section-sub">Companies approaching public markets. Filed, expected, and rumored — tracked before the crowds.</p>
+      <div class="ipo-grid" id="ipo-grid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Underdogs -->
+  <section class="section-pad underdogs-section" style="background:var(--bg-base)">
+    <div class="container">
+      <p class="section-eyebrow mono-tag">Hidden Gems</p>
+      <h2 class="section-h2">Underdogs to Watch</h2>
+      <p class="section-sub">Small-cap and mid-cap companies with asymmetric upside. Low coverage, high potential.</p>
+      <div class="underdog-grid" id="underdogs-grid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Portfolio Analyzer -->
+  <section class="section-pad portfolio-section" style="background:var(--bg-surface)">
+    <div class="container">
+      <p class="section-eyebrow mono-tag">Portfolio Tools</p>
+      <h2 class="section-h2">Analyze Your Holdings</h2>
+      <p class="section-sub">Enter your positions and get AI-powered keep, trim, or sell recommendations based on today's scores and your active risk profile.</p>
+      <div class="portfolio-inner">
+        <div class="portfolio-input-wrap">
+          <label for="portfolio-input" style="display:block;font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px;font-family:var(--font-code);letter-spacing:0.1em;text-transform:uppercase">Holdings — one per line, or comma-separated (e.g. AAPL 100, MSFT 50)</label>
+          <textarea id="portfolio-input" class="portfolio-textarea" placeholder="AAPL 100&#10;MSFT 50&#10;NVDA 25&#10;TSLA 75" rows="6" spellcheck="false"></textarea>
+          <button class="btn-primary" style="margin-top:12px" onclick="analyzePortfolio()">Analyze Portfolio →</button>
+        </div>
+        <div id="portfolio-results" class="portfolio-results">
+          <p class="portfolio-hint">Enter your holdings above to get recommendations.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="footer-inner"><div class="footer-brand"><div class="logo-area"><svg width="28" height="28" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="opacity:0.55"><circle cx="100" cy="100" r="94" stroke="#E2E8F0" stroke-width="9" fill="none"/><rect x="115" y="6" width="14" height="188" fill="rgba(7,9,15,0.01)"/><line x1="122" y1="6" x2="122" y2="194" stroke="#E2E8F0" stroke-width="1.2"/><line x1="122" y1="50" x2="136" y2="50" stroke="#E2E8F0" stroke-width="1.0"/><line x1="122" y1="100" x2="140" y2="100" stroke="#E2E8F0" stroke-width="1.4"/><line x1="122" y1="150" x2="136" y2="150" stroke="#E2E8F0" stroke-width="1.0"/></svg><span style="font-family:'Space Grotesk',system-ui,sans-serif;font-size:1.1rem;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.55)">Orpulus</span></div><p>Revolutionizing manufacturing and supply chain management through innovative technology and a commitment to a sustainable future.</p></div><div class="footer-col"><h4>Navigate</h4><ul><li><a href="#" onclick="showTab('home');return false">Home</a></li><li><a href="#" onclick="showTab('story');return false">Our Story</a></li><li><a href="#" onclick="showTab('values');return false">Values</a></li><li><a href="#" onclick="showTab('software');return false">Software</a></li></ul></div><div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="mailto:hello@orpulus.com">Contact</a></li></ul></div><div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms</a></li></ul></div></div><div class="footer-bottom"><p class="footer-copy">&copy; <span class="yr"></span> Orpulus. All rights reserved.</p><p class="footer-copy">hello@orpulus.com</p></div></footer>
+</div><!-- /tab-markets -->
+
+
+<!-- ════ MODAL ════ -->
+<div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-label="Subscription confirmed">
+  <div class="modal">
+    <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+    <div class="modal-icon">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <circle cx="20" cy="20" r="19" stroke="var(--accent)" stroke-width="2" fill="none"/>
+        <path class="check-path" d="M10 20 L17 27 L30 13" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <h2>We Will Be<br/>In Touch!</h2>
+    <p>
+      Thank you, <span class="modal-name" id="modal-name">there</span>! 🎉<br/>
+      You have been added to our list. We will reach out as soon as we are ready to launch.
+      Expect great things.
+    </p>
+    <button class="btn-primary" onclick="document.getElementById('modal').classList.remove('open');document.body.style.overflow=''">
+      Close
+    </button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="alert" aria-live="polite">
+  <span id="toast-msg">Done!</span>
+</div>
+
+<script src="js/main.js?v=8"></script>
+</body>
+</html>

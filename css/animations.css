@@ -1,0 +1,292 @@
+/* ═══════════════════════════════════════════════════
+   ORPULUS — ANIMATIONS STYLESHEET
+═══════════════════════════════════════════════════ */
+
+/* ── Keyframes ─────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeLeft {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeRight {
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Blob floating */
+@keyframes blobFloat {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33%       { transform: translate(20px, -25px) scale(1.05); }
+  66%       { transform: translate(-15px, 15px) scale(0.96); }
+}
+
+/* Pulse dot (status indicator) */
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.45; transform: scale(1.6); }
+}
+
+/* Shimmer sweep */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+/* Countdown flip */
+@keyframes flipDown {
+  0%   { transform: rotateX(0deg); }
+  50%  { transform: rotateX(-90deg); opacity: 0.4; }
+  100% { transform: rotateX(0deg); opacity: 1; }
+}
+
+/* Progress fill reveal */
+@keyframes fillBar {
+  from { width: 0; }
+}
+
+/* Checkmark draw */
+@keyframes drawCheck {
+  0%   { stroke-dashoffset: 60; }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* Tab page entry */
+@keyframes tabEnter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Background mesh gradient shift */
+@keyframes meshShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Soft bounce (CTA button attention) */
+@keyframes softBounce {
+  0%, 100% { transform: translateY(0); }
+  30%       { transform: translateY(-6px); }
+  60%       { transform: translateY(-2px); }
+}
+
+/* Rotate slow (decorative) */
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Ripple on button click */
+@keyframes ripple {
+  from { transform: scale(0); opacity: 0.5; }
+  to   { transform: scale(3); opacity: 0; }
+}
+
+/* Modal icon pop */
+@keyframes iconPop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  70%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Card enter stagger */
+@keyframes cardEnter {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Glow pulse */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(99,102,241,0); }
+  50%       { box-shadow: 0 0 30px rgba(99,102,241,0.25); }
+}
+
+/* Number counter tick */
+@keyframes countTick {
+  0%   { transform: translateY(0); opacity: 1; }
+  40%  { transform: translateY(-8px); opacity: 0; }
+  60%  { transform: translateY(8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* ── Applied Animation Classes ─────────────────── */
+
+/* Hero entrance sequence */
+.anim-hero-badge  { animation: fadeUp 0.7s ease both; }
+.anim-hero-title  { animation: fadeUp 0.75s 0.10s ease both; }
+.anim-hero-eye    { animation: fadeUp 0.75s 0.18s ease both; }
+.anim-hero-sub    { animation: fadeUp 0.75s 0.26s ease both; }
+.anim-hero-count  { animation: fadeUp 0.75s 0.34s ease both; }
+.anim-hero-form   { animation: fadeUp 0.75s 0.42s ease both; }
+.anim-hero-note   { animation: fadeUp 0.75s 0.50s ease both; }
+
+/* Page tab enter */
+.tab-page.active > * { animation: tabEnter 0.4s ease both; }
+
+/* Mesh bg animation */
+.hero-bg-animated {
+  background-size: 300% 300%;
+  animation: meshShift 12s ease infinite;
+}
+
+/* CTA attention bounce (after 4s) */
+.btn-bounce { animation: softBounce 0.8s 4s ease 2; }
+
+/* Shimmer skeleton */
+.shimmer {
+  background: linear-gradient(90deg, var(--bg-raised) 25%, rgba(99,102,241,0.08) 50%, var(--bg-raised) 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+/* Countdown flip on change */
+.cd-flip { animation: flipDown 0.25s ease; }
+
+/* Progress bar on scroll */
+.prog-fill.animate { animation: fillBar 1.4s cubic-bezier(0.4,0,0.2,1) both; }
+
+/* Modal icon enter */
+.modal-icon.pop { animation: iconPop 0.55s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+/* Check SVG draw */
+.check-path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+}
+.check-path.draw { animation: drawCheck 0.5s 0.2s ease forwards; }
+
+/* Ripple effect */
+.btn-ripple { position: relative; overflow: hidden; }
+.btn-ripple .ripple-circle {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,0.25); pointer-events: none;
+  animation: ripple 0.6s linear forwards;
+}
+
+/* Blob animations */
+.blob-animate-1 { animation: blobFloat 12s ease-in-out infinite; }
+.blob-animate-2 { animation: blobFloat 16s ease-in-out infinite reverse; }
+.blob-animate-3 { animation: blobFloat 10s ease-in-out 3s infinite; }
+.blob-animate-4 { animation: blobFloat 14s ease-in-out 6s infinite reverse; }
+
+/* Decorative rotating ring */
+.ring-rotate { animation: rotateSlow 30s linear infinite; }
+
+/* Stock card enter */
+.stock-card.reveal.visible {
+  animation: cardEnter 0.5s var(--ease) both;
+}
+
+/* Value card hover */
+.value-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(99,102,241,0.05), transparent);
+  border-radius: inherit; opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.value-card:hover::before { opacity: 1; }
+
+/* Nav underline slide */
+.nav-tabs button { position: relative; }
+.nav-tabs button::after {
+  content: ''; position: absolute; bottom: -2px; left: 50%; right: 50%; height: 2px;
+  background: var(--accent); border-radius: 2px;
+  transition: left 0.3s ease, right 0.3s ease;
+}
+.nav-tabs button.active::after, .nav-tabs button:hover::after {
+  left: 16%; right: 16%;
+}
+
+/* Hero badge pulse ring */
+.badge-dot::before {
+  content: ''; position: absolute; inset: -4px; border-radius: 50%;
+  border: 2px solid rgba(16,185,129,0.40); animation: pulseDot 2s infinite;
+}
+
+/* Approach item left border animate */
+.approach-item { position: relative; }
+.approach-item::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: linear-gradient(180deg, var(--accent), var(--cyan));
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  transform: scaleY(0); transform-origin: top;
+  transition: transform 0.4s ease;
+}
+.approach-item:hover::before { transform: scaleY(1); }
+
+/* Filter button transition */
+.filter-btn { transition: all 0.25s cubic-bezier(0.4,0,0.2,1); }
+
+/* App card border glow on hover */
+.app-card::after {
+  content: ''; position: absolute; inset: -1px; border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--accent), var(--cyan), var(--purple));
+  z-index: -1; opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.app-card:hover::after { opacity: 0.25; }
+
+/* Stock card glow on hover */
+.stock-card:hover {
+  animation: glowPulse 2s ease infinite;
+}
+
+/* ── Scroll Reveal Variants ────────────────────── */
+.d6  { transition-delay: 0.48s; }
+.d7  { transition-delay: 0.56s; }
+.d8  { transition-delay: 0.64s; }
+
+/* Stagger children */
+.stagger-children > *:nth-child(1) { transition-delay: 0.00s; }
+.stagger-children > *:nth-child(2) { transition-delay: 0.08s; }
+.stagger-children > *:nth-child(3) { transition-delay: 0.16s; }
+.stagger-children > *:nth-child(4) { transition-delay: 0.24s; }
+.stagger-children > *:nth-child(5) { transition-delay: 0.32s; }
+.stagger-children > *:nth-child(6) { transition-delay: 0.40s; }
+.stagger-children > *:nth-child(7) { transition-delay: 0.48s; }
+.stagger-children > *:nth-child(8) { transition-delay: 0.56s; }
+
+/* ── Loading bar ───────────────────────────────── */
+.load-bar {
+  position: fixed; top: 0; left: 0; z-index: 9999; height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple));
+  width: 0; transition: width 0.4s ease; border-radius: 0 2px 2px 0;
+}
+
+/* ── Page transition overlay ───────────────────── */
+.page-transition {
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  background: var(--bg-surface);
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.76,0,0.24,1);
+}
+.page-transition.out { transform: translateY(0); }
+.page-transition.in  { transform: translateY(-100%); }
+
+/* ── Motion-safe preference ────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
