@@ -165,8 +165,9 @@ const UNDERDOG_STOCKS = [
   { symbol:'SMCI', name:'Super Micro Computer', sector:'AI Infrastructure', mcap:'$14B', potential:'AI Build-out', desc:'AI server rack maker shipping GPU-dense systems 6–9 months ahead of Dell and HP. Direct NVIDIA GPU allocation.', thesis:'Every AI model requires thousands of servers. SMCI\'s modular design and faster delivery create pricing power during AI infrastructure surge.', price:42.40 },
 ];
 
-const CACHE_KEY = 'orpulus_stocks_v3';
+const CACHE_KEY = 'orpulus_stocks_v4';
 const CACHE_TTL = 6 * 60 * 60 * 1000;
+const LIVE_QUOTES_URL = 'api/stocks.php?symbols=';
 
 /* ── Tabs ──────────────────────────────────────── */
 function showTab(id) {
@@ -568,39 +569,67 @@ function scoreStock(row, idx, seed, weights) {
   };
 }
 
-/* ── Live price fetch (Yahoo Finance, best-effort) ─
-   Falls back silently on CORS/network errors          */
+/* ── Live price fetch via local API proxy ───────────
+   Keeps Yahoo Finance off the browser path to avoid CORS failures. */
 async function fetchLivePrices(symbols) {
+  const cleanSymbols = [...new Set((symbols || []).map(s => String(s).trim().toUpperCase()).filter(Boolean))];
+  if (!cleanSymbols.length) return {};
+
   try {
-    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols.join(',')}&fields=regularMarketPrice,regularMarketChangePercent,regularMarketTime`;
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(4000) });
+    const url = LIVE_QUOTES_URL + encodeURIComponent(cleanSymbols.join(','));
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(8000) });
     if (!res.ok) return {};
     const data = await res.json();
-    const map  = {};
-    (data.quoteResponse?.result || []).forEach(q => {
-      map[q.symbol] = { price: q.regularMarketPrice, changePct: q.regularMarketChangePercent };
-    });
-    return map;
-  } catch { return {}; }
+    return data.quotes || {};
+  } catch {
+    return {};
+  }
+}
+
+function mergeLiveQuotes(stocks, liveMap) {
+  if (!liveMap || !Object.keys(liveMap).length) return stocks;
+  return stocks.map(stock => {
+    const live = liveMap[stock.symbol];
+    if (!live || typeof live.price !== 'number') return stock;
+    return {
+      ...stock,
+      price: live.price,
+      changePercent: typeof live.changePct === 'number' ? live.changePct : stock.changePercent,
+      live: true,
+    };
+  });
 }
 
 function applyLivePrices(liveMap) {
-  if (!liveMap || !Object.keys(liveMap).length) return;
+  if (!liveMap || !Object.keys(liveMap).length) {
+    setLiveStatus(false);
+    return;
+  }
   document.querySelectorAll('.stock-card[data-symbol]').forEach(card => {
     const sym  = card.dataset.symbol;
     const live = liveMap[sym];
-    if (!live) return;
+    if (!live || typeof live.price !== 'number') return;
     const priceEl  = card.querySelector('.stock-price');
     const changeEl = card.querySelector('.stock-change');
     if (priceEl)  priceEl.textContent = '$' + live.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     if (changeEl) {
-      const pct = live.changePct;
+      const pct = typeof live.changePct === 'number' ? live.changePct : 0;
       changeEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '% ' + (pct >= 0 ? '▲' : '▼');
       changeEl.className   = 'stock-change ' + (pct >= 0 ? 'positive' : 'negative');
     }
+    card.classList.add('has-live-price');
   });
-  const badge = document.getElementById('live-price-badge');
-  if (badge) badge.innerHTML = '<span class="live-dot-sm"></span> LIVE';
+  setLiveStatus(true);
+}
+
+function setLiveStatus(isLive) {
+  const badge = document.getElementById('live-badge');
+  if (badge) {
+    badge.classList.toggle('is-muted', !isLive);
+    badge.innerHTML = `<span class="live-dot-sm"></span>${isLive ? 'Live API' : 'Offline fallback'}`;
+  }
+  const source = document.getElementById('markets-data-source');
+  if (source) source.textContent = isLive ? 'Yahoo Finance live API' : 'Curated fallback data';
 }
 
 /* ── Ticker strip renderer ─────────────────────── */
@@ -651,21 +680,22 @@ async function loadStocks(forceRefresh = false) {
     } catch {}
   }
 
-  await new Promise(r => setTimeout(r, 500));
-
   const prof   = RISK_PROFILES[activeRiskProfile];
   const seed   = dailySeed();
   const scored = STOCK_UNIVERSE
     .filter(row => row[6] <= prof.maxBeta) // beta filter
     .map((row, idx) => scoreStock(row, idx, seed, prof.weights));
   scored.sort((a, b) => b.scores.total - a.scores.total);
-  const top10  = scored.slice(0, 10).map((s, i) => ({ ...s, rank: i + 1 }));
+  let top10  = scored.slice(0, 10).map((s, i) => ({ ...s, rank: i + 1 }));
+  const liveQuotes = await fetchLivePrices(top10.map(s => s.symbol));
+  top10 = mergeLiveQuotes(top10, liveQuotes);
 
   const cacheKey = CACHE_KEY + '_' + activeRiskProfile;
   localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), stocks: top10 }));
 
   const now = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   renderStocks(top10, grid, updated, source, scanned, now);
+  setLiveStatus(Object.keys(liveQuotes).length > 0);
   startPriceRefresh(top10.map(s => s.symbol));
 
   renderIPOs();
@@ -675,7 +705,7 @@ async function loadStocks(forceRefresh = false) {
 function renderStocks(stocks, grid, updated, source, scanned, ts) {
   stocksLoaded = true;
   if (updated) updated.textContent = 'Updated ' + ts;
-  if (source)  source.textContent  = RISK_PROFILES[activeRiskProfile].label + ' · ' + STOCK_UNIVERSE.length + ' stocks scored';
+  if (source)  source.textContent  = RISK_PROFILES[activeRiskProfile].label + ' · live API ready';
   if (scanned) scanned.textContent = STOCK_UNIVERSE.length + ' stocks scanned';
 
   grid.innerHTML = '';

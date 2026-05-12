@@ -14,13 +14,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
 define('CACHE_FILE', __DIR__ . '/../db/stocks_cache.json');
 define('CACHE_TTL',  21600); // 6 hours
+define('QUOTE_CACHE_TTL', 60); // 1 minute
+
+// ── Cache helpers ──────────────────────────────────────────────────────────
+function ensureCacheDir(): void {
+    $dir = dirname(CACHE_FILE);
+    if (!is_dir($dir)) @mkdir($dir, 0775, true);
+}
+
+function cachePath(string $name): string {
+    ensureCacheDir();
+    return dirname(CACHE_FILE) . '/' . $name;
+}
+
+function sendJson(array $payload): void {
+    echo json_encode($payload);
+    exit;
+}
+
+// ── Attempt live prices from Yahoo Finance ─────────────────────────────────
+function fetchYahooQuotes(array $symbols): array {
+    $symbols = array_values(array_unique(array_filter(array_map(static function ($symbol) {
+        $symbol = strtoupper(trim((string) $symbol));
+        return preg_match('/^[A-Z0-9.\-]{1,12}$/', $symbol) ? $symbol : null;
+    }, $symbols))));
+
+    if (!$symbols) return [];
+
+    $symbolStr = rawurlencode(implode(',', $symbols));
+    $fields    = 'regularMarketPrice,regularMarketChangePercent,fiftyTwoWeekChangePercent,regularMarketVolume,regularMarketTime,shortName,longName';
+    $url       = "https://query1.finance.yahoo.com/v7/finance/quote?symbols={$symbolStr}&fields={$fields}";
+    $ctx = stream_context_create(['http' => [
+        'method'  => 'GET',
+        'header'  => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\nAccept: application/json\r\n",
+        'timeout' => 8,
+        'ignore_errors' => true,
+    ]]);
+    $raw = @file_get_contents($url, false, $ctx);
+    if (!$raw) return [];
+    $decoded = json_decode($raw, true);
+    if (empty($decoded['quoteResponse']['result'])) return [];
+    $out = [];
+    foreach ($decoded['quoteResponse']['result'] as $q) {
+        if (!empty($q['symbol'])) $out[$q['symbol']] = $q;
+    }
+    return $out;
+}
+
+function normalizeQuote(array $q): array {
+    return [
+        'symbol'      => $q['symbol'] ?? '',
+        'name'        => $q['shortName'] ?? ($q['longName'] ?? null),
+        'price'       => isset($q['regularMarketPrice']) ? round((float) $q['regularMarketPrice'], 2) : null,
+        'changePct'   => isset($q['regularMarketChangePercent']) ? round((float) $q['regularMarketChangePercent'], 2) : 0.0,
+        'week52Change'=> isset($q['fiftyTwoWeekChangePercent']) ? round((float) $q['fiftyTwoWeekChangePercent'], 2) : null,
+        'volume'      => $q['regularMarketVolume'] ?? null,
+        'marketTime'  => $q['regularMarketTime'] ?? null,
+    ];
+}
+
+// ── Live quote proxy for the browser ───────────────────────────────────────
+if (isset($_GET['symbols'])) {
+    $symbols = array_slice(explode(',', $_GET['symbols']), 0, 120);
+    $cacheKey = 'quotes_' . md5(implode(',', array_map('strtoupper', $symbols))) . '.json';
+    $quoteCache = cachePath($cacheKey);
+
+    if (file_exists($quoteCache)) {
+        $cached = json_decode(file_get_contents($quoteCache), true);
+        if ($cached && isset($cached['timestamp']) && (time() - $cached['timestamp']) < QUOTE_CACHE_TTL) {
+            $cached['cached'] = true;
+            sendJson($cached);
+        }
+    }
+
+    $liveQuotes = fetchYahooQuotes($symbols);
+    $quotes = [];
+    foreach ($liveQuotes as $symbol => $quote) {
+        $quotes[$symbol] = normalizeQuote($quote);
+    }
+
+    $payload = [
+        'timestamp'   => time(),
+        'lastUpdated' => date('M j, Y \a\t g:i A'),
+        'dataSource'  => $quotes ? 'Yahoo Finance Live Quote API' : 'Live quote API unavailable',
+        'cached'      => false,
+        'quotes'      => $quotes,
+    ];
+
+    @file_put_contents($quoteCache, json_encode($payload));
+    sendJson($payload);
+}
 
 // ── Serve cache if fresh ───────────────────────────────────────────────────
 if (file_exists(CACHE_FILE)) {
     $cached = json_decode(file_get_contents(CACHE_FILE), true);
     if ($cached && isset($cached['timestamp']) && (time() - $cached['timestamp']) < CACHE_TTL) {
-        echo json_encode($cached);
-        exit;
+        $cached['cached'] = true;
+        sendJson($cached);
     }
 }
 
@@ -60,28 +150,6 @@ $universe = [
   ['DIS','Walt Disney Co.','Communication Services',   28.4, 18.4,  2.8, 1.18,  220,   4.8, 482.4, 1.82, 0.92, 1.8, 'Entertainment empire reaching streaming profitability milestone while parks and live experiences maintain pricing power.'],
   ['INTC','Intel Corporation','Technology',            42.4, 28.4,  1.2, 1.14,   80,  -2.8,-189.4, 2.05, 0.00, 2.4, 'Legacy chip giant executing a foundry turnaround with government subsidies supporting the domestic semiconductor push.'],
 ];
-
-// ── Attempt live prices from Yahoo Finance ─────────────────────────────────
-function fetchYahooQuotes(array $symbols): array {
-    $symbolStr = implode(',', $symbols);
-    $fields     = 'regularMarketPrice,regularMarketChangePercent,fiftyTwoWeekChangePercent,regularMarketVolume';
-    $url        = "https://query1.finance.yahoo.com/v7/finance/quote?symbols={$symbolStr}&fields={$fields}";
-    $ctx = stream_context_create(['http' => [
-        'method'  => 'GET',
-        'header'  => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\nAccept: application/json\r\n",
-        'timeout' => 8,
-        'ignore_errors' => true,
-    ]]);
-    $raw = @file_get_contents($url, false, $ctx);
-    if (!$raw) return [];
-    $decoded = json_decode($raw, true);
-    if (empty($decoded['quoteResponse']['result'])) return [];
-    $out = [];
-    foreach ($decoded['quoteResponse']['result'] as $q) {
-        $out[$q['symbol']] = $q;
-    }
-    return $out;
-}
 
 // ── Scoring engine (multi-factor AI model) ─────────────────────────────────
 function scoreStock(array $s, ?array $live): array {
@@ -266,6 +334,7 @@ $payload = [
 ];
 
 // Write cache
+ensureCacheDir();
 @file_put_contents(CACHE_FILE, json_encode($payload));
 
-echo json_encode($payload);
+sendJson($payload);

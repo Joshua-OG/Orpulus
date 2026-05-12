@@ -1038,6 +1038,14 @@ footer {
   background: var(--green); animation: pulseDot 1.8s infinite;
   flex-shrink: 0;
 }
+.live-badge.is-muted {
+  color: var(--amber);
+  background: var(--amber-dim);
+  border-color: rgba(245,158,11,0.22);
+}
+.live-badge.is-muted .live-dot-sm {
+  background: var(--amber);
+}
 
 /* ── Scrolling ticker strip ─────────────────── */
 .ticker-strip {
