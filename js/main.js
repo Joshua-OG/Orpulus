@@ -165,7 +165,7 @@ const UNDERDOG_STOCKS = [
   { symbol:'SMCI', name:'Super Micro Computer', sector:'AI Infrastructure', mcap:'$14B', potential:'AI Build-out', desc:'AI server rack maker shipping GPU-dense systems 6–9 months ahead of Dell and HP. Direct NVIDIA GPU allocation.', thesis:'Every AI model requires thousands of servers. SMCI\'s modular design and faster delivery create pricing power during AI infrastructure surge.', price:42.40 },
 ];
 
-const CACHE_KEY = 'orpulus_stocks_v4';
+const CACHE_KEY = 'orpulus_stocks_v5';
 const CACHE_TTL = 6 * 60 * 60 * 1000;
 const LIVE_QUOTES_URL = 'api/stocks.php?symbols=';
 
@@ -477,7 +477,7 @@ function initRiskTabs() {
       const desc = document.getElementById('risk-profile-desc');
       if (desc) desc.textContent = prof.desc;
       stocksLoaded = false;
-      localStorage.removeItem(CACHE_KEY);
+      localStorage.removeItem(CACHE_KEY + '_' + activeRiskProfile);
       loadStocks(true);
     });
   });
@@ -490,7 +490,7 @@ function seededRand(seed, min, max) {
 
 /* ── Score a single stock ──────────────────────
    weights: { growth, value, analyst, momentum, risk }  */
-function scoreStock(row, idx, seed, weights) {
+function scoreStock(row, idx, seed, weights, liveData = null) {
   const [symbol, name, sector, pe, fwdPE, pb, beta,
          marketCapB, revGrowth, earnGrowth, analystMean,
          divYield, shortRatio, basePrice, desc] = row;
@@ -498,8 +498,11 @@ function scoreStock(row, idx, seed, weights) {
 
   const priceSeed = seed * 1000 + idx;
   const priceMult = 0.96 + seededRand(priceSeed, 0, 0.08);
-  const price     = parseFloat((basePrice * priceMult).toFixed(2));
-  const changePct = parseFloat((seededRand(priceSeed + 1, -4.5, 5.5)).toFixed(2));
+  
+  const hasLivePrice = liveData && typeof liveData.price === 'number';
+  const price     = hasLivePrice ? liveData.price : parseFloat((basePrice * priceMult).toFixed(2));
+  const changePct = liveData && typeof liveData.changePct === 'number' ? liveData.changePct : parseFloat((seededRand(priceSeed + 1, -4.5, 5.5)).toFixed(2));
+  const wk52chg   = liveData && typeof liveData.week52Change === 'number' ? liveData.week52Change : seededRand(seed * 2000 + idx, -20, 80);
 
   const revScore  = Math.min(100, Math.max(0, 50 + revGrowth * 0.6));
   const earnScore = Math.min(100, Math.max(0, 50 + earnGrowth * 0.25));
@@ -512,8 +515,6 @@ function scoreStock(row, idx, seed, weights) {
 
   const analyst   = Math.round((5 - analystMean) / 4 * 100);
 
-  const momSeed   = seed * 2000 + idx;
-  const wk52chg   = seededRand(momSeed, -20, 80);
   const momentum  = Math.round(Math.min(100, Math.max(0, 50 + wk52chg * 0.5)));
 
   const betaDev   = Math.abs(beta - 1.0);
@@ -537,12 +538,15 @@ function scoreStock(row, idx, seed, weights) {
   const revStr       = revGrowth  >= 0 ? '+' + revGrowth  + '%' : revGrowth  + '%';
   const earnStr      = earnGrowth >= 0 ? '+' + earnGrowth + '%' : earnGrowth + '%';
 
-  const reasoning = `${name} scores ${total}/100 under the ${RISK_PROFILES[activeRiskProfile].label} profile. `
+  const baseReasoning = `${name} scores ${total}/100 under the ${RISK_PROFILES[activeRiskProfile].label} profile. `
     + `Revenue growth of ${revStr} YoY with earnings at ${earnStr} — Growth score ${growth}. `
     + `Wall Street consensus: "${analystLabel}" (${analystMean.toFixed(1)}/5) — Analyst score ${analyst}. `
     + (fwdPE > 0 ? `Forward P/E ${fwdPE}x: ${fwdPE < 20 ? 'attractive' : fwdPE < 35 ? 'fair' : 'growth premium'} vs. peers. ` : '')
     + `Beta ${beta}: ${beta < 0.8 ? 'defensive — below-market volatility' : beta < 1.3 ? 'moderate sensitivity to market moves' : 'elevated volatility — size positions accordingly'}. `
     + desc;
+
+  const livePrefix = hasLivePrice ? `Live Update: Trading at $${price.toFixed(2)} (${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%). ` : '';
+  const reasoning = livePrefix + baseReasoning;
 
   const tags = [];
   if (total >= 72)          tags.push('Strong Buy');
@@ -555,6 +559,7 @@ function scoreStock(row, idx, seed, weights) {
   if (marketCapB >= 1000)   tags.push('Mega Cap');
   if (marketCapB < 50)      tags.push('Small Cap');
   if (shortRatio > 3)       tags.push('High Short');
+  if (wk52chg > 20)         tags.push('Strong Momentum');
   tags.push(sector);
 
   return {
@@ -565,7 +570,8 @@ function scoreStock(row, idx, seed, weights) {
     marketCap: '$' + mktCapStr,
     divYield: divYield > 0 ? divYield.toFixed(2) + '%' : '—',
     scores: { total, growth, value, analyst, momentum, risk },
-    reasoning, tags,
+            baseReasoning, reasoning, tags,
+            live: hasLivePrice
   };
 }
 
@@ -586,38 +592,101 @@ async function fetchLivePrices(symbols) {
   }
 }
 
+function getMarketScanSymbols() {
+  return [...new Set([
+    ...STOCK_UNIVERSE.map(row => row[0]),
+    ...UNDERDOG_STOCKS.map(stock => stock.symbol),
+  ])];
+}
+
+function liveQuoteCount(liveMap) {
+  return Object.values(liveMap || {}).filter(q => q && typeof q.price === 'number').length;
+}
+
 function mergeLiveQuotes(stocks, liveMap) {
-  if (!liveMap || !Object.keys(liveMap).length) return stocks;
-  return stocks.map(stock => {
-    const live = liveMap[stock.symbol];
-    if (!live || typeof live.price !== 'number') return stock;
+  return stocks.map(s => {
+    const live = liveMap[s.symbol];
+    if (!live || typeof live.price !== 'number') return s;
+    const pct = typeof live.changePct === 'number' ? live.changePct : s.changePercent;
+    const livePrefix = `Live Update: Trading at $${live.price.toFixed(2)} (${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%). `;
     return {
-      ...stock,
+      ...s,
       price: live.price,
-      changePercent: typeof live.changePct === 'number' ? live.changePct : stock.changePercent,
+      changePercent: pct,
+      reasoning: livePrefix + s.baseReasoning,
       live: true,
     };
   });
 }
 
 function applyLivePrices(liveMap) {
-  if (!liveMap || !Object.keys(liveMap).length) {
+  const liveCount = liveQuoteCount(liveMap);
+  if (!liveCount) {
     setLiveStatus(false);
     return;
   }
+
+  const setVal = (el, str) => {
+    if (el && el.textContent !== str) {
+      el.textContent = str;
+      el.classList.remove('val-flash');
+      void el.offsetWidth; // trigger reflow
+      el.classList.add('val-flash');
+    }
+  };
+
   document.querySelectorAll('.stock-card[data-symbol]').forEach(card => {
     const sym  = card.dataset.symbol;
     const live = liveMap[sym];
     if (!live || typeof live.price !== 'number') return;
     const priceEl  = card.querySelector('.stock-price');
     const changeEl = card.querySelector('.stock-change');
-    if (priceEl)  priceEl.textContent = '$' + live.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const analysisEl = card.querySelector('.analysis-text');
+    if (priceEl) setVal(priceEl, '$' + live.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     if (changeEl) {
       const pct = typeof live.changePct === 'number' ? live.changePct : 0;
-      changeEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '% ' + (pct >= 0 ? '▲' : '▼');
-      changeEl.className   = 'stock-change ' + (pct >= 0 ? 'positive' : 'negative');
+      const str = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '% ' + (pct >= 0 ? '▲' : '▼');
+      if (changeEl.textContent !== str) {
+          changeEl.textContent = str;
+          changeEl.className = 'stock-change ' + (pct >= 0 ? 'positive' : 'negative');
+          changeEl.classList.remove('val-flash');
+          void changeEl.offsetWidth;
+          changeEl.classList.add('val-flash');
+      }
+    }
+    if (analysisEl && analysisEl.dataset.base) {
+      const pct = typeof live.changePct === 'number' ? live.changePct : 0;
+      const newText = `Live Update: Trading at $${live.price.toFixed(2)} (${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%). ` + analysisEl.dataset.base;
+      if (analysisEl.textContent !== newText) {
+          analysisEl.textContent = newText;
+          analysisEl.classList.remove('val-flash');
+          void analysisEl.offsetWidth;
+          analysisEl.classList.add('val-flash');
+      }
     }
     card.classList.add('has-live-price');
+  });
+
+  document.querySelectorAll('.underdog-card[data-symbol]').forEach(card => {
+    const sym = card.dataset.symbol;
+    const live = liveMap[sym];
+    if (!live || typeof live.price !== 'number') return;
+
+    const priceEl = card.querySelector('.underdog-price');
+    const changeEl = card.querySelector('.underdog-change');
+    const pct = typeof live.changePct === 'number' ? live.changePct : 0;
+    const up = pct >= 0;
+    if (priceEl) setVal(priceEl, '$' + live.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    if (changeEl) {
+      const str = (up ? '+' : '') + pct.toFixed(2) + '%';
+      if (changeEl.textContent !== str) {
+          changeEl.textContent = str;
+          changeEl.className = 'underdog-change ' + (up ? 'positive' : 'negative');
+          changeEl.classList.remove('val-flash');
+          void changeEl.offsetWidth;
+          changeEl.classList.add('val-flash');
+      }
+    }
   });
 
   // Update ticker strip prices dynamically
@@ -630,26 +699,32 @@ function applyLivePrices(liveMap) {
     
     const priceEl = item.querySelector('.t-px');
     const changeEl = item.querySelector('.t-chg');
-    if (priceEl) priceEl.textContent = '$' + live.price.toFixed(2);
+    if (priceEl) setVal(priceEl, '$' + live.price.toFixed(2));
     if (changeEl) {
       const pct = typeof live.changePct === 'number' ? live.changePct : 0;
       const up = pct >= 0;
-      changeEl.textContent = (up ? '+' : '') + pct.toFixed(2) + '%';
-      changeEl.className = 't-chg ' + (up ? 'up' : 'down');
+      const str = (up ? '+' : '') + pct.toFixed(2) + '%';
+      if (changeEl.textContent !== str) {
+          changeEl.textContent = str;
+          changeEl.className = 't-chg ' + (up ? 'up' : 'down');
+          changeEl.classList.remove('val-flash');
+          void changeEl.offsetWidth;
+          changeEl.classList.add('val-flash');
+      }
     }
   });
 
-  setLiveStatus(true);
+  setLiveStatus(true, liveCount);
 }
 
-function setLiveStatus(isLive) {
+function setLiveStatus(isLive, count = 0) {
   const badge = document.getElementById('live-badge');
   if (badge) {
     badge.classList.toggle('is-muted', !isLive);
-    badge.innerHTML = `<span class="live-dot-sm"></span>${isLive ? 'Live API' : 'Offline fallback'}`;
+    badge.innerHTML = `<span class="live-dot-sm"></span>${isLive ? `Live API · ${count || 'on'}` : 'Offline fallback'}`;
   }
   const source = document.getElementById('markets-data-source');
-  if (source) source.textContent = isLive ? 'Yahoo Finance live API' : 'Curated fallback data';
+  if (source) source.textContent = isLive ? `Yahoo Finance live API · ${count} symbols` : 'Curated fallback data';
 }
 
 /* ── Ticker strip renderer ─────────────────────── */
@@ -685,7 +760,7 @@ async function loadStocks(forceRefresh = false) {
   grid.innerHTML = `
     <div class="stocks-loading" id="stocks-loading">
       <div class="loading-spinner"></div>
-      <p>AI is scoring ${STOCK_UNIVERSE.length} stocks — ${RISK_PROFILES[activeRiskProfile].label} profile…</p>
+      <p>AI is scoring ${getMarketScanSymbols().length} market symbols — ${RISK_PROFILES[activeRiskProfile].label} profile…</p>
     </div>`;
 
   if (!forceRefresh) {
@@ -694,7 +769,9 @@ async function loadStocks(forceRefresh = false) {
       const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
       if (cached && (Date.now() - cached.ts) < CACHE_TTL) {
         renderStocks(cached.stocks, grid, updated, source, scanned, 'Just now');
-        startPriceRefresh(cached.stocks.map(s => s.symbol));
+        renderIPOs();
+        renderUnderdogs();
+        startPriceRefresh(getMarketScanSymbols());
         return;
       }
     } catch {}
@@ -707,7 +784,8 @@ async function loadStocks(forceRefresh = false) {
     .map((row, idx) => scoreStock(row, idx, seed, prof.weights));
   scored.sort((a, b) => b.scores.total - a.scores.total);
   let top10  = scored.slice(0, 10).map((s, i) => ({ ...s, rank: i + 1 }));
-  const liveQuotes = await fetchLivePrices(top10.map(s => s.symbol));
+  const scanSymbols = getMarketScanSymbols();
+  const liveQuotes = await fetchLivePrices(scanSymbols);
   top10 = mergeLiveQuotes(top10, liveQuotes);
 
   const cacheKey = CACHE_KEY + '_' + activeRiskProfile;
@@ -715,18 +793,19 @@ async function loadStocks(forceRefresh = false) {
 
   const now = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   renderStocks(top10, grid, updated, source, scanned, now);
-  setLiveStatus(Object.keys(liveQuotes).length > 0);
-  startPriceRefresh(top10.map(s => s.symbol));
+  setLiveStatus(liveQuoteCount(liveQuotes) > 0, liveQuoteCount(liveQuotes));
 
   renderIPOs();
-  renderUnderdogs();
+  renderUnderdogs(liveQuotes);
+  
+  startPriceRefresh(scanSymbols, liveQuotes);
 }
 
 function renderStocks(stocks, grid, updated, source, scanned, ts) {
   stocksLoaded = true;
   if (updated) updated.textContent = 'Updated ' + ts;
   if (source)  source.textContent  = RISK_PROFILES[activeRiskProfile].label + ' · live API ready';
-  if (scanned) scanned.textContent = STOCK_UNIVERSE.length + ' stocks scanned';
+  if (scanned) scanned.textContent = `${getMarketScanSymbols().length} symbols scanned · hidden gems included`;
 
   grid.innerHTML = '';
   stocks.forEach((stock, idx) => {
@@ -744,13 +823,17 @@ function renderStocks(stocks, grid, updated, source, scanned, ts) {
   setTimeout(initReveal, 50);
 }
 
-function startPriceRefresh(symbols) {
+function startPriceRefresh(symbols, initialLiveMap = null) {
   if (priceRefreshTimer) clearInterval(priceRefreshTimer);
   const doRefresh = async () => {
     const live = await fetchLivePrices(symbols);
     applyLivePrices(live);
   };
-  doRefresh();
+  if (initialLiveMap && Object.keys(initialLiveMap).length > 0) {
+      applyLivePrices(initialLiveMap);
+  } else {
+      doRefresh();
+  }
   priceRefreshTimer = setInterval(doRefresh, 60000);
 }
 
@@ -813,6 +896,10 @@ function buildStockCard(s, idx) {
         </div>
       </div>
 
+      <div class="stock-chart-wrap" style="height: 140px; margin: 12px 0 8px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); pointer-events: none; background: rgba(0,0,0,0.1);">
+        <iframe src="https://s.tradingview.com/widgetembed/?symbol=${s.symbol}&interval=D&theme=dark&style=3&timezone=Etc%2FUTC&hide_top_toolbar=1&hide_legend=1&saveimage=0" width="100%" height="100%" frameborder="0" scrolling="no" allowtransparency="true" style="transform: scale(1.02); transform-origin: center;"></iframe>
+      </div>
+
       <div class="stock-score-section">
         <div class="score-header">
           <span class="score-label">AI Score</span>
@@ -848,7 +935,7 @@ function buildStockCard(s, idx) {
         <div class="analysis-header">
           <span class="ai-badge">✦ AI Analysis</span>
         </div>
-        <p class="analysis-text">${escHtml(s.reasoning)}</p>
+        <p class="analysis-text" data-base="${escHtml(s.baseReasoning)}">${escHtml(s.reasoning)}</p>
       </div>
 
       <div class="stock-tags">${tagHtml}</div>
@@ -906,28 +993,47 @@ function renderIPOs() {
 }
 
 /* ── Underdog Stocks ───────────────────────────────────────────── */
-function renderUnderdogs() {
+function renderUnderdogs(liveMap = {}) {
   const grid = document.getElementById('underdogs-grid');
   if (!grid) return;
-  grid.innerHTML = UNDERDOG_STOCKS.map(u => `
-    <div class="underdog-card">
-      <div class="underdog-header">
-        <div class="underdog-symbol">${escHtml(u.symbol)}</div>
-        <div class="underdog-potential">${escHtml(u.potential)}</div>
-      </div>
-      <div class="underdog-name">${escHtml(u.name)}</div>
-      <div class="underdog-sector">${escHtml(u.sector)} · Market Cap ${escHtml(u.mcap)}</div>
-      <p class="underdog-desc">${escHtml(u.desc)}</p>
-      <div class="underdog-thesis"><strong>Thesis:</strong> ${escHtml(u.thesis)}</div>
-      <div class="stock-links">
-        <a class="stock-link" href="https://finance.yahoo.com/chart/${u.symbol}" target="_blank" rel="noopener">📈 Chart</a>
-        <a class="stock-link" href="https://finance.yahoo.com/quote/${u.symbol}/news/" target="_blank" rel="noopener">📰 News</a>
-      </div>
-    </div>`).join('');
+  grid.innerHTML = UNDERDOG_STOCKS.map(u => renderUnderdogCard(u, liveMap)).join('');
+}
+
+function renderUnderdogCard(u, liveMap = {}) {
+  const live = liveMap[u.symbol] || {};
+  const price = typeof live.price === 'number' ? live.price : u.price;
+  const changePct = typeof live.changePct === 'number' ? live.changePct : null;
+  const changeCls = changePct === null ? '' : changePct >= 0 ? 'positive' : 'negative';
+  const changeText = changePct === null ? 'Awaiting live quote' : (changePct >= 0 ? '+' : '') + changePct.toFixed(2) + '%';
+
+  return `
+  <div class="underdog-card" data-symbol="${escHtml(u.symbol)}">
+    <div class="underdog-header">
+      <div class="underdog-symbol">${escHtml(u.symbol)}</div>
+      <div class="underdog-potential">${escHtml(u.potential)}</div>
+    </div>
+    <div class="underdog-name">${escHtml(u.name)}</div>
+    <div class="underdog-sector">${escHtml(u.sector)} · Market Cap ${escHtml(u.mcap)}</div>
+    <div class="underdog-quote-row" style="margin-bottom: 12px;">
+      <span class="underdog-price">$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+      <span class="underdog-change ${changeCls}">${changeText}</span>
+    </div>
+    
+    <div class="stock-chart-wrap" style="height: 120px; margin: 12px 0 16px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); pointer-events: none; background: rgba(0,0,0,0.1);">
+      <iframe src="https://s.tradingview.com/widgetembed/?symbol=${escHtml(u.symbol)}&interval=D&theme=dark&style=3&timezone=Etc%2FUTC&hide_top_toolbar=1&hide_legend=1&saveimage=0" width="100%" height="100%" frameborder="0" scrolling="no" allowtransparency="true" style="transform: scale(1.02); transform-origin: center;"></iframe>
+    </div>
+
+    <p class="underdog-desc">${escHtml(u.desc)}</p>
+    <div class="underdog-thesis"><strong>Thesis:</strong> ${escHtml(u.thesis)}</div>
+    <div class="stock-links">
+      <a class="stock-link" href="https://finance.yahoo.com/chart/${u.symbol}" target="_blank" rel="noopener">📈 Chart</a>
+      <a class="stock-link" href="https://finance.yahoo.com/quote/${u.symbol}/news/" target="_blank" rel="noopener">📰 News</a>
+    </div>
+  </div>`;
 }
 
 /* ── Portfolio Analyzer ────────────────────────────────────────── */
-function analyzePortfolio() {
+async function analyzePortfolio() {
   const input = document.getElementById('portfolio-input');
   const results = document.getElementById('portfolio-results');
   if (!input || !results) return;
@@ -938,7 +1044,7 @@ function analyzePortfolio() {
   const lines = raw.split(/[\n,]+/).map(l => l.trim()).filter(Boolean);
   const holdings = [];
   for (const line of lines) {
-    const m = line.match(/^([A-Za-z]{1,5})\s+(\d+(?:\.\d+)?)$/);
+    const m = line.match(/^([A-Za-z0-9.\-]{1,12})\s+(\d+(?:\.\d+)?)$/);
     if (m) holdings.push({ symbol: m[1].toUpperCase(), shares: parseFloat(m[2]) });
   }
 
@@ -947,6 +1053,9 @@ function analyzePortfolio() {
     return;
   }
 
+  results.innerHTML = '<div class="stocks-loading" style="padding: 40px 0;"><div class="loading-spinner"></div><p>Analyzing portfolio...</p></div>';
+
+  const liveMap = await fetchLivePrices(holdings.map(h => h.symbol));
   const seed = dailySeed();
   const prof = RISK_PROFILES[activeRiskProfile];
   const rows = holdings.map(h => {
@@ -954,7 +1063,7 @@ function analyzePortfolio() {
     if (!universeRow) {
       return { symbol: h.symbol, shares: h.shares, rec: 'hold', recLabel: 'Hold', reason: 'Not in our universe — research independently.', found: false };
     }
-    const scored = scoreStock(universeRow, 0, seed, prof.weights);
+    const scored = scoreStock(universeRow, 0, seed, prof.weights, liveMap[h.symbol]);
     let rec, recLabel, reason;
     if (scored.scores.total >= 72) {
       rec = 'keep'; recLabel = 'Keep';
@@ -987,8 +1096,63 @@ function analyzePortfolio() {
   `;
 }
 
+/* ── Quick Search ──────────────────────────────────────────────── */
+window.quickSearchStock = async function() {
+  const input = document.getElementById('quick-search-input');
+  const resContainer = document.getElementById('quick-search-result');
+  if (!input || !resContainer) return;
+
+  const sym = input.value.trim().toUpperCase();
+  if (!sym) return;
+
+  resContainer.innerHTML = '<div class="stocks-loading" style="padding: 40px 0;"><div class="loading-spinner"></div><p>Analyzing ' + escHtml(sym) + '...</p></div>';
+
+  const universeRow = STOCK_UNIVERSE.find(r => r[0] === sym);
+  const underdogRow = UNDERDOG_STOCKS.find(r => r.symbol === sym);
+
+  if (!universeRow && !underdogRow) {
+    resContainer.innerHTML = `<div class="stocks-disclaimer" style="margin-top:0">Ticker <strong>${escHtml(sym)}</strong> not found in our curated AI Universe of 105 stocks and hidden gems.</div>`;
+    return;
+  }
+
+  const liveMap = await fetchLivePrices([sym]);
+  resContainer.innerHTML = '';
+
+  if (universeRow) {
+    const seed = dailySeed();
+    const prof = RISK_PROFILES[activeRiskProfile];
+    let scored = scoreStock(universeRow, 0, seed, prof.weights, liveMap[sym]);
+    
+    const card = buildStockCard(scored, 0);
+    card.classList.add('visible');
+    resContainer.appendChild(card);
+    
+    setTimeout(() => {
+      card.querySelectorAll('.score-fill, .score-sub-fill').forEach(bar => {
+        bar.style.width = bar.dataset.w || '0%';
+      });
+    }, 100);
+  } else if (underdogRow) {
+    resContainer.innerHTML = `
+      <div class="underdog-grid" style="grid-template-columns:1fr; margin-top:0;">
+        ${renderUnderdogCard(underdogRow, liveMap)}
+      </div>
+    `;
+  }
+};
+
 /* ── Hash routing (must be last — all consts initialized above) ─ */
 (function () {
+  const searchInput = document.getElementById('quick-search-input');
+  if (searchInput) {
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        window.quickSearchStock();
+      }
+    });
+  }
+
   const hash  = location.hash.replace('#', '');
   const valid = ['home', 'story', 'values', 'software', 'markets'];
   if (valid.includes(hash)) showTab(hash);

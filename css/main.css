@@ -684,7 +684,11 @@ img { display: block; max-width: 100%; }
 
 /* Stocks grid */
 .stocks-grid {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 22px;
+  position: relative;
+  align-items: start;
 }
 
 /* Loading state */
@@ -938,7 +942,6 @@ footer {
   .values-grid { grid-template-columns: repeat(2, 1fr); }
   .ind-grid { grid-template-columns: repeat(2, 1fr); }
   .footer-inner { grid-template-columns: 1fr 1fr; gap: 36px; }
-  .stocks-grid { grid-template-columns: 1fr; }
   .score-breakdown { grid-template-columns: repeat(5, 1fr); }
 }
 @media (max-width: 860px) {
@@ -1142,6 +1145,18 @@ footer {
 .underdog-mcap { font-family: var(--font-code); font-size: 0.60rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); padding-top: 4px; }
 .underdog-name { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 3px; }
 .underdog-sector { font-family: var(--font-code); font-size: 0.60rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+.underdog-quote-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.underdog-price {
+  font-size: 1rem; font-weight: 700; color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.underdog-change {
+  font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 6px;
+  color: var(--text-muted); background: rgba(255,255,255,0.04);
+  font-variant-numeric: tabular-nums;
+}
+.underdog-change.positive { color: var(--green); background: var(--green-dim); }
+.underdog-change.negative { color: var(--red); background: var(--red-dim); }
 .underdog-potential {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 3px 9px; border-radius: 99px; margin-bottom: 12px;
@@ -1225,6 +1240,22 @@ footer {
   line-height: 1.6; border-left: 3px solid var(--accent);
 }
 
+/* ── Market data adaptive width ─────────────── */
+#tab-markets .container {
+  max-width: 1720px;
+  padding-left: clamp(16px, 3vw, 56px);
+  padding-right: clamp(16px, 3vw, 56px);
+}
+#tab-markets .stocks-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+}
+#tab-markets .ipo-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+}
+#tab-markets .underdog-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+}
+
 /* ── Home Markets CTA ───────────────────────── */
 .home-markets-cta {
   background: var(--bg-raised);
@@ -1252,5 +1283,7 @@ footer {
   .portfolio-summary { grid-template-columns: 1fr 1fr; }
   .portfolio-header-row, .portfolio-row { grid-template-columns: 64px 54px 40px 1fr; gap: 8px; }
   .pr-reason { grid-column: 1 / -1; }
-  .ipo-grid, .underdog-grid { grid-template-columns: 1fr; }
+  #tab-markets .stocks-grid,
+  #tab-markets .ipo-grid,
+  #tab-markets .underdog-grid { grid-template-columns: 1fr; }
 }

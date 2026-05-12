@@ -41,7 +41,7 @@ function fetchYahooQuotes(array $symbols): array {
 
     if (!$symbols) return [];
 
-    $symbolStr = rawurlencode(implode(',', $symbols));
+    $symbolStr = implode(',', array_map('rawurlencode', $symbols));
     $fields    = 'regularMarketPrice,regularMarketChangePercent,fiftyTwoWeekChangePercent,regularMarketVolume,regularMarketTime,shortName,longName';
     $url       = "https://query1.finance.yahoo.com/v7/finance/quote?symbols={$symbolStr}&fields={$fields}&corsDomain=finance.yahoo.com";
     $ctx = stream_context_create(['http' => [
@@ -97,11 +97,13 @@ if (isset($_GET['symbols'])) {
         'timestamp'   => time(),
         'lastUpdated' => date('M j, Y \a\t g:i A'),
         'dataSource'  => $quotes ? 'Yahoo Finance Live Quote API' : 'Live quote API unavailable',
+        'ok'          => (bool) $quotes,
+        'quoteCount'  => count($quotes),
         'cached'      => false,
         'quotes'      => $quotes,
     ];
 
-    @file_put_contents($quoteCache, json_encode($payload));
+    if ($quotes) @file_put_contents($quoteCache, json_encode($payload));
     sendJson($payload);
 }
 

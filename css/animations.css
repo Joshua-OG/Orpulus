@@ -128,6 +128,13 @@
   100% { transform: translateY(0); opacity: 1; }
 }
 
+/* Value Flash (live data updates) */
+@keyframes valFlash {
+  0%   { color: inherit; }
+  50%  { color: var(--accent-light); text-shadow: 0 0 12px var(--accent-glow); }
+  100% { color: inherit; }
+}
+
 /* ── Applied Animation Classes ─────────────────── */
 
 /* Hero entrance sequence */
@@ -190,6 +197,9 @@
 
 /* Decorative rotating ring */
 .ring-rotate { animation: rotateSlow 30s linear infinite; }
+
+/* Live value flash */
+.val-flash { animation: valFlash 1s ease; }
 
 /* Stock card enter */
 .stock-card.reveal.visible {

@@ -543,7 +543,7 @@
           <span class="refresh-dot"></span>
           <span id="markets-updated">Loading…</span>
           <span class="markets-dot">·</span>
-          <span id="markets-scanned">105 stocks scanned</span>
+          <span id="markets-scanned">105 symbols scanned · hidden gems included</span>
           <span class="markets-dot">·</span>
           <span id="markets-data-source">Connecting…</span>
         </div>
@@ -631,6 +631,20 @@
       <div class="underdog-grid" id="underdogs-grid">
         <!-- Populated by JS -->
       </div>
+    </div>
+  </section>
+
+  <!-- Quick Analysis Search -->
+  <section class="section-pad search-section" style="background:var(--bg-base); border-top:1px solid var(--border);">
+    <div class="container">
+      <p class="section-eyebrow mono-tag">Instant Insights</p>
+      <h2 class="section-h2">Quick Stock Search</h2>
+      <p class="section-sub">Search our 105-stock universe for an immediate AI score and fundamental breakdown.</p>
+      <div class="quick-search-box" style="display:flex; gap:12px; max-width:480px; margin-bottom: 24px;">
+        <input type="text" id="quick-search-input" class="form-input" placeholder="Enter Ticker (e.g. NVDA, TSLA)" style="flex:1; text-transform: uppercase; font-family: var(--font-code);">
+        <button class="btn-primary" onclick="quickSearchStock()">Analyze</button>
+      </div>
+      <div id="quick-search-result" style="max-width: 600px;"></div>
     </div>
   </section>
 
